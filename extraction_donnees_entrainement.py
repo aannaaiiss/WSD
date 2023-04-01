@@ -19,19 +19,31 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     context_vector = {}
     
     #on boucle sur les mots de la phrase pour construire les listes
+    #on cherche l'instance et on repart en arrière pour constuire le contexte avant
     i_instance = 0
     while sentence[i_instance].tag != "instance" : 
-        context_before.append(sentence[i_instance].text.lower())
         i_instance+=1
         
     context_vector["instance"] = sentence[i_instance].text.lower()
+    
+    #on vérifie la longueur des phrases pour ne pas soulever d'erreur
+    if (len(sentence[:i_instance])>=10) :
+            for i in range(1,11) :
+                context_before.append(sentence[i_instance-i].text.lower())
+    else :
+        for i in range(1,len(sentence[:i_instance])+1) :
+            context_before.append(sentence[i_instance-i].text.lower())
 
-    for i in range(i_instance+1,len(sentence)):
-        context_after.append(sentence[i].text.lower())
-        
-    #une fois les listes constituées, on ajoute les balises de début et de fin de phras    
+    if(len(sentence[i_instance+1:])>= 10) :
+        for i in range(i_instance+1,i_instance+11):
+            context_after.append(sentence[i].text.lower())
+    else :
+        for i in range(i_instance+1,len(sentence)):
+            context_after.append(sentence[i].text.lower())
+    
+    #une fois les listes constituées, on ajoute les balises de début et de fin de phrase si nécessaire
     for i in range(10-len(context_before)) :
-        context_before.insert(0,"<d>")
+        context_before.append("<d>")
         
     for i in range(10-len(context_after)) :
         context_after.append("<f>")
@@ -41,7 +53,7 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
         context_vector["next_word_"+str(i+1)] = context_after[i]
         
     for i in range(10):
-        context_vector["previous_word_"+str(i+1)] = context_before[9-i]
+        context_vector["previous_word_"+str(i+1)] = context_before[i]
         
     #on récupère ensuite le nombre associé au sens pour constuire l'exemple
     gold = int((re.findall("ws_[0-9]",gold_line)[0]).replace("ws_",""))
