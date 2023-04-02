@@ -18,7 +18,6 @@ nlp = spacy.load('fr_core_news_md')
 
 X = []
 
-
 for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     
     #pour chaque phrase, on initialise deux listes qui permettront de respecter les tailles des contextes (+10,-10)
@@ -31,31 +30,23 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     i_instance = 0
     while sentence[i_instance].tag != "instance" : 
         i_instance+=1
+        
+    context_vector["instance"] = sentence[i_instance].text.lower()
     
-    instance = nlp(sentence[i_instance].text.lower())[0]
-    context_vector["instance"] = instance.lemma_
-    
-    #on vérifie la longueur des portions avant et après le mot à désambiguiser pour ne pas soulever d'erreur de range
-    
-    #contexte avant
+    #on vérifie la longueur des phrases pour ne pas soulever d'erreur
     if (len(sentence[:i_instance])>=10) :
             for i in range(1,11) :
-                word = nlp(sentence[i_instance-i].text.lower())[0]
-                context_before.append(word.lemma_)
+                context_before.append(sentence[i_instance-i].text.lower())
     else :
         for i in range(1,len(sentence[:i_instance])+1) :
-            word = nlp(sentence[i_instance-i].text.lower())[0]
-            context_before.append(word.lemma_)
+            context_before.append(sentence[i_instance-i].text.lower())
 
-    #contexte après
     if(len(sentence[i_instance+1:])>= 10) :
         for i in range(i_instance+1,i_instance+11):
-            word = nlp(sentence[i].text.lower())[0]
-            context_after.append(word.lemma_)
+            context_after.append(sentence[i].text.lower())
     else :
         for i in range(i_instance+1,len(sentence)):
-            word = nlp(sentence[i].text.lower())[0]
-            context_after.append(word.lemma_)
+            context_after.append(sentence[i].text.lower())
     
     #une fois les listes constituées, on ajoute les balises de début et de fin de phrase si nécessaire
     for i in range(10-len(context_before)) :
@@ -74,6 +65,11 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     #on récupère ensuite le nombre associé au sens pour constuire l'exemple
     gold = int((re.findall("ws_[0-9]",gold_line)[0]).replace("ws_",""))
     
+    #on reboucle sur le vecteur pour lemmatizer 
+    for word in context_vector :
+        if word != "instance" :
+            context_vector[word] = nlp(context_vector[word])[0].lemma_
+            
     X.append((context_vector,gold))
     
 print(len(X))  
