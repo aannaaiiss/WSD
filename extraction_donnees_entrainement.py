@@ -1,15 +1,23 @@
 import re
 import xml.etree.ElementTree as ET
+import spacy
 
+#paths à définir
 data_path = "donnees/FSE-1.1-191210/wiktionary-190418.data.xml"
 gold_path = "donnees/FSE-1.1-191210/wiktionary-190418.gold.key.txt"
 
+#récupération des données XML
 tree = ET.parse(data_path)
 data = tree.getroot()[0]
 
+#récupération des données .txt
 gold_file = open(gold_path, "r",encoding="utf-8")
 
+#lemmatizer
+nlp = spacy.load('fr_core_news_md')
+
 X = []
+
 
 for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     
@@ -23,23 +31,31 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     i_instance = 0
     while sentence[i_instance].tag != "instance" : 
         i_instance+=1
-        
-    context_vector["instance"] = sentence[i_instance].text.lower()
     
-    #on vérifie la longueur des phrases pour ne pas soulever d'erreur
+    instance = nlp(sentence[i_instance].text.lower())[0]
+    context_vector["instance"] = instance.lemma_
+    
+    #on vérifie la longueur des portions avant et après le mot à désambiguiser pour ne pas soulever d'erreur de range
+    
+    #contexte avant
     if (len(sentence[:i_instance])>=10) :
             for i in range(1,11) :
-                context_before.append(sentence[i_instance-i].text.lower())
+                word = nlp(sentence[i_instance-i].text.lower())[0]
+                context_before.append(word.lemma_)
     else :
         for i in range(1,len(sentence[:i_instance])+1) :
-            context_before.append(sentence[i_instance-i].text.lower())
+            word = nlp(sentence[i_instance-i].text.lower())[0]
+            context_before.append(word.lemma_)
 
+    #contexte après
     if(len(sentence[i_instance+1:])>= 10) :
         for i in range(i_instance+1,i_instance+11):
-            context_after.append(sentence[i].text.lower())
+            word = nlp(sentence[i].text.lower())[0]
+            context_after.append(word.lemma_)
     else :
         for i in range(i_instance+1,len(sentence)):
-            context_after.append(sentence[i].text.lower())
+            word = nlp(sentence[i].text.lower())[0]
+            context_after.append(word.lemma_)
     
     #une fois les listes constituées, on ajoute les balises de début et de fin de phrase si nécessaire
     for i in range(10-len(context_before)) :
