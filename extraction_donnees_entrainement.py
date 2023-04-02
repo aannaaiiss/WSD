@@ -13,8 +13,10 @@ data = tree.getroot()[0]
 #récupération des données .txt
 gold_file = open(gold_path, "r",encoding="utf-8")
 
+'''
 #lemmatizer
 nlp = spacy.load('fr_core_news_md')
+'''
 
 X = []
 
@@ -65,12 +67,14 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     #on récupère ensuite le nombre associé au sens pour constuire l'exemple
     gold = int((re.findall("ws_[0-9]",gold_line)[0]).replace("ws_",""))
     
+    '''
     #on reboucle sur le vecteur pour lemmatizer 
     for word in context_vector :
         if word != "instance" :
             context_vector[word] = nlp(context_vector[word])[0].lemma_
             
     X.append((context_vector,gold))
+    '''
     
 print(len(X))  
 print(X[0])
