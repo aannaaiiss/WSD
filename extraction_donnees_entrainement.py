@@ -72,9 +72,9 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     for word in context_vector :
         if word != "instance" :
             context_vector[word] = nlp(context_vector[word])[0].lemma_
-            
-    X.append((context_vector,gold))
     '''
+    X.append((context_vector,gold))
+    
     
 print(len(X))  
 print(X[0])
