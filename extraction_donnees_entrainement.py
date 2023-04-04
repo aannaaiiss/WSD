@@ -31,16 +31,29 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     context_vector["instance"] = sentence[i_instance].attrib['lemma'].lower()
     
     #on vérifie la longueur des phrases pour ne pas soulever d'erreur
+    
+    #context_before 
+    
+    #si le contexte avant l'instance est supérieur ou égale à la taille du contexte choisie
+    #on ajoute à la liste chaque mot aux index from i-instance-1 to i_instance-11
     if (len(sentence[:i_instance])>=context_size) :
             for i in range(1,context_size+1) :
                 context_before.append(sentence[i_instance-i].attrib['lemma'].lower())
+    
+    #sinon, on ajoute à la liste tous les mots et on ajoutera des balises pour compléter
     else :
         for i in range(1,len(sentence[:i_instance])+1) :
             context_before.append(sentence[i_instance-i].attrib['lemma'].lower())
 
+    #context_after
+    
+    #si le contexte après l'instance est supérieur ou égale à la taille du contexte choisie
+    #on ajoute à la liste chaque mot aux index from i-instance+1 to i_instance+11
     if(len(sentence[i_instance+1:])>= context_size) :
         for i in range(i_instance+1,i_instance+(context_size+1)):
             context_after.append(sentence[i].attrib['lemma'].lower())
+    
+    #sinon, on ajoute à la liste tous les mots et on ajoutera des balises pour compléter
     else :
         for i in range(i_instance+1,len(sentence)):
             context_after.append(sentence[i].attrib['lemma'].lower())
@@ -66,4 +79,6 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     
     
 print(len(X))  
-print(X[0])
+
+for i in range(5) :
+    print("example n° "+ i +" : ",X[i])
