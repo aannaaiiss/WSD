@@ -78,7 +78,3 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     X.append((context_vector,gold))
     
     
-print(len(X))  
-
-for i in range(5) :
-    print("example n° "+ i +" : ",X[i])
