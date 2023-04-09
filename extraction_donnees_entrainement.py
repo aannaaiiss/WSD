@@ -12,7 +12,7 @@ data = tree.getroot()[0]
 #récupération des données .txt
 gold_file = open(gold_path, "r",encoding="utf-8")
 
-X = []
+instance2examples = {} 
 context_size = 10
 
 for (sentence,gold_line) in zip(data,gold_file.readlines()) :
@@ -27,8 +27,12 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     i_instance = 0
     while sentence[i_instance].tag != "instance" : 
         i_instance+=1
-        
-    context_vector["instance"] = sentence[i_instance].attrib['lemma'].lower()
+    
+    instance = sentence[i_instance].attrib['lemma'].lower()
+    context_vector["instance"] = instance
+    
+    if instance not in instance2examples : 
+        instance2examples[instance] = []
     
     #on vérifie la longueur des phrases pour ne pas soulever d'erreur
     
@@ -75,6 +79,7 @@ for (sentence,gold_line) in zip(data,gold_file.readlines()) :
     #on récupère ensuite le nombre associé au sens pour constuire l'exemple
     gold = int((re.findall("ws_[0-9]",gold_line)[0]).replace("ws_",""))
     
-    X.append((context_vector,gold))
-    
+    instance2examples[instance].append((context_vector,gold))
+
+print(instance2examples["2.0"])
     
