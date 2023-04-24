@@ -51,6 +51,3 @@ for example in phrases:
         toy.append((sent,gold))
         
 print(toy)
-
-
-
