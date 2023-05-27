@@ -1,10 +1,10 @@
-phrases = [(["Le rue , pourtant étroit , /aboutir sur le place Juan Carlos ."], 1), (["Le projet ne avoir pas /aboutir ."], 2), 
-            (["Le marge ne être pas /justifier ."],1), (["Votre absence ne être pas /justifier ."], 2),
-            (["Je être /intervenir pour faire cesser le dispute ."], 1), (["Le professeur être /intervenir au sujet de le distanciation social ."], 2),
-            (["Je y être /arriver !"], 1), (["Je être /arriver !"], 2),
-            (["Le policier avoir /interpeler le jeune manifestant ."], 1), (["Ce anomalie me avoir /interpeler ."], 2)]
+phrases = [(["La rue , pourtant étroite , /aboutit sur la place Juan Carlos ."], 1), (["Le projet n'a pas /abouti ."], 2), 
+            (["La marge n'est pas /justifiée ."],1), (["Votre absence n'est pas /justifiée ."], 2),
+            (["Je suis /intervenue pour faire cesser le dispute ."], 1), (["Le professeur est /intervenu au sujet de la distanciation social ."], 2),
+            (["J'y suis /arrivé !"], 1), (["Je suis /arrivé !"], 2),
+            (["Le policier a /interpelé le jeune manifestant ."], 1), (["Cette anomalie m'a /interpelée ."], 2)]
 
-window_size = 10
+context_size = 10
 
 def left_context(context): 
     '''
@@ -13,7 +13,7 @@ def left_context(context):
     '''
     left = {}
     context.reverse()
-    for i in range(0,window_size,1):
+    for i in range(0,context_size,1):
         if i < len(context):
             left.update({f'previous_word_{i+1}': context[i]})
         else: 
@@ -27,7 +27,7 @@ def right_context(context):
     returns: dictionary of following words
     '''
     right = {}
-    for i in range(window_size): 
+    for i in range(context_size): 
         if i < len(context):
              right.update({f'next_word_{i+1}': context[i]})
         else: 
@@ -51,3 +51,6 @@ for example in phrases:
         toy.append((sent,gold))
         
 print(toy)
+
+
+
