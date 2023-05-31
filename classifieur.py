@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 import re
 import xml.etree.ElementTree as ET
 from sklearn.model_selection import train_test_split
@@ -185,7 +185,9 @@ class Classifieur :
         
         print("instance :",instance)
         print(f'{data_size*100}% des données annotées considérées')
-        print("nombre de données annotées : ", len(X))
+        print("nombre de données d'entraînement : ", len(X_train))
+        print("étiquettes possibles pour cette instance : ", self.w2senses[instance])
+        print("étiquettes présentes dans les données d'entraînement :",Counter(list(zip(*selected_examples))[1]))
         print("prédiction :", y_pred)
         print("gold :",y_test)
         print("accuracy score : ", accuracy_score(y_pred,y_test),"\n")
@@ -205,7 +207,7 @@ class Classifieur :
 
             for instance in instances :
                 self.classify(instance,data_size)
-                print(' ')
+                print()
         return        
         
     
@@ -214,4 +216,4 @@ class Classifieur :
 myClassif = Classifieur(data_path,gold_path,embeddings_path)
 #myClassif.classify("aboutir",0.8)
 instances = list(myClassif.w2examples.keys())
-myClassif.test_classifications(instances[:3],0.2)
+myClassif.test_classifications(instances[:3],0.25)
