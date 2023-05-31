@@ -27,7 +27,7 @@ class Classifieur :
         self.w2examples, self.w2senses = self.extract_examples_and_senses(data_file,gold_file)
         self.w2emb = self.extract_embeddings(embeddings_path)
     
-    def extract_examples_and_senses(data_file, gold_file):
+    def extract_examples_and_senses(self,data_file, gold_file):
         """Extract the data from the files.
 
         Args:
@@ -106,9 +106,9 @@ class Classifieur :
             w2senses[instance].add(gold)
             w2examples[instance].append((context,gold))
             
-            return w2examples,w2senses
+        return w2examples,w2senses
     
-    def extract_embeddings(path_embeddings) :
+    def extract_embeddings(self,path_embeddings) :
         """Récupère les embeddings dans le fichier générée.
 
         Args:
@@ -128,7 +128,7 @@ class Classifieur :
             w2emb[word] = embedding
         return w2emb
 
-    def look_up(context, w2emb) :
+    def look_up(self,context, w2emb) :
         """Remplace dans le vecteur de contexte les mots par leur embedding.
 
         Args:
@@ -145,7 +145,7 @@ class Classifieur :
                 context_emb = np.add(context_emb, np.array(w2emb[word]))             
         return context_emb
     
-    def select_examples(examples,senses,size):
+    def select_examples(self,examples,senses,size):
         """Choisit des examples d'entraînement représentatifs du corpus.
 
         Args:
@@ -172,9 +172,6 @@ class Classifieur :
 
     def classify(self,instance,data_size) :
         
-        print("instance :",instance)
-        print(f'{data_size*100}% des données annotées considérées')
-        
         clf = MLPClassifier(random_state=1,hidden_layer_sizes=(1000,)) 
         
         selected_examples = self.select_examples(self.w2examples[instance],self.w2senses[instance],data_size)
@@ -186,6 +183,8 @@ class Classifieur :
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
         
+        print("instance :",instance)
+        print(f'{data_size*100}% des données annotées considérées')
         print("nombre de données annotées : ", len(X))
         print("prédiction :", y_pred)
         print("gold :",y_test)
@@ -193,7 +192,26 @@ class Classifieur :
         
         return y_pred
     
+    def test_classifications(self,instances,step):
+        """Permet d'afficher différents tests de classification pour les instances données. 
+
+        Args:
+            instances (list): classifieurs utilisés
+            step (float): pas de descente de la quantité de données considérées
+        """
+        for i in range(round(1.0/step)):
+            
+            data_size = 1.0 - (step*float(i))
+
+            for instance in instances :
+                self.classify(instance,data_size)
+                print(' ')
+        return        
+        
+    
 #_____________________________________________________________________________________________________________
 
 myClassif = Classifieur(data_path,gold_path,embeddings_path)
-myClassif.classify("aboutir",0.8)
+#myClassif.classify("aboutir",0.8)
+instances = list(myClassif.w2examples.keys())
+myClassif.test_classifications(instances[:3],0.2)
